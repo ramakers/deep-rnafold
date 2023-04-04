@@ -19,7 +19,7 @@ https://uni-duesseldorf.sciebo.de/s/UapNNvwkCIVMHib
 The raw data for training the embeddings is placed in ./data/substructures_drifts.pkl
 and consists of three pandas DataFrames for train, validation and test set.
 
-For training the generator, we refer to the .npy file in the repository which i a matrix consisting sequence, embedding, shape and homologs information.
+For training the generator, we refer to the .npy file in the repository which is a matrix consisting stacked sequence, embedding, shape and homologs information.
 
 ************************
 ## VQVAE
