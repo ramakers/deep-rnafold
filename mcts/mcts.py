@@ -18,6 +18,16 @@ puzzle_nr        = 115 #=4xw7 in our test set
 nr_rollouts      = 50000
 N_simrna         = 1000
 
+#### choose to include shape data
+SHAPE            = True
+if SHAPE
+    # 4xw7 is 64 nucleotides. so can include either zeros (=no shape info avail) or SHAPE values here
+    # in a vecotr of length 64
+    shape_data        = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+                                  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+                                  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+                                  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+
 
 with open('../data/npy_vqvae_embeddings_28022023.pkl', 'rb') as f:
     traindata, valdata, testdata = pickle.load( f)       
@@ -353,13 +363,21 @@ targets_emb      = tbatch[column_z]
 
 
 
-
-
+if SHAPE==False:
+    shape_data   = tbatch[column_shape]
+else:
+    zeros_to_add = 100 - len(shape_data)
+    for i in range(zeros_to_add):
+        shape_data.append(0.0)
+    ##### format SHAPE into required format (batch_size x 1 x L)
+    shape_data = np.concatenate([np.stack([shape_data] for i in range(batch_size))])
+    
 zero_action      = get_zero_actions(batch_size)
 feed_dict={
           xsequence:tbatch[column_seq], 
           xcontact_mask: xcontact_mask: tbatch[column_cm],
-          xshape: tbatch[column_shape],
+          #### load either shape from npy file or individual array as defined on top of this code #####
+          xshape: shape_data,
           xhomologs: tbatch[column_homologs],
           xshift_vals: zero_shift, train_ph: False, step_ph: ckpt_idx,
           ################################
